@@ -72,10 +72,20 @@ export default class {
     this.document = document
     this.onNavigate = onNavigate
     this.store = store
+    this.bills = bills
     $('#arrow-icon1').click((e) => this.handleShowTickets(e, bills, 1))
     $('#arrow-icon2').click((e) => this.handleShowTickets(e, bills, 2))
     $('#arrow-icon3').click((e) => this.handleShowTickets(e, bills, 3))
     new Logout({ localStorage, onNavigate })
+    
+    // Ajout d'un event listener global pour tous les bills via délégation d'événements
+    $(document).on('click', '[id^="open-bill"]', (e) => {
+      const billId = e.currentTarget.id.replace('open-bill', '')
+      const bill = bills.find(b => b.id.toString() === billId)
+      if (bill) {
+        this.handleEditTicket(e, bill, bills)
+      }
+    })
   }
 
   handleClickIconEye = () => {
@@ -86,6 +96,8 @@ export default class {
   }
 
   handleEditTicket(e, bill, bills) {
+    /* Fix bug Issue4 */
+    e.stopPropagation();
     if (this.counter === undefined || this.id !== bill.id) this.counter = 0
     if (this.id === undefined || this.id !== bill.id) this.id = bill.id
     if (this.counter % 2 === 0) {
@@ -131,6 +143,8 @@ export default class {
   }
 
   handleShowTickets(e, bills, index) {
+    /* Fix bug Issue 4 */
+    e.stopPropagation()
     if (this.counter === undefined || this.index !== index) this.counter = 0
     if (this.index === undefined || this.index !== index) this.index = index
     if (this.counter % 2 === 0) {
@@ -144,13 +158,9 @@ export default class {
         .html("")
       this.counter ++
     }
-
-    bills.forEach(bill => {
-      $(`#open-bill${bill.id}`).click((e) => this.handleEditTicket(e, bill, bills))
-    })
-
+    
+    
     return bills
-
   }
 
   getBillsAllUsers = () => {
