@@ -19,16 +19,28 @@ const row = (bill) => {
     </tr>
     `;
 };
+const parseDate = (str) => {
 
+  const months = {
+      "Jan.": 0, "Fev.": 1, "Mar.": 2, "Avr.": 3, "May.": 4, "Jun.": 5,
+      "Jul.": 6, "Aug.": 7, "Sep.": 8, "Oct.": 9, "Nov.": 10, "Dec.": 11
+  };
+  const [day, month, year] = str.date.split(" ");
+
+  return new Date(2000 + parseInt(year), months[month], parseInt(day));
+};
 const rows = (data) => {
   /* Fix le bug Issue 1*/
+  
+  
   return data && data.length
     ? data
-        .sort((a, b) => (a.date < b.date ? 1 : -1))
+        .sort((a, b) => parseDate(a) < parseDate(b)? 1 : -1) 
         .map((bill) => row(bill))
         .join("")
-    : "";
+    : "";    
 };
+
 
 export default ({ data: bills, loading, error }) => {
   const modal = () => `
